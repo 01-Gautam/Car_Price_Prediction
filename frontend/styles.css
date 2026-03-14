@@ -836,6 +836,7 @@ button:disabled,
     display: grid;
     grid-template-columns: 1fr 1.4fr;
     gap: var(--sp-2xl);
+    width: 100%;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -927,6 +928,13 @@ button:disabled,
     }
 }
 
+.band-mid {
+    padding: var(--sp-3xl) var(--sp-xl);
+}
+
+.band-large {
+    padding: var(--sp-3xl) var(--sp-2xl);
+}
 .p-card {
     background: var(--bg-elevated);
     border: 1px solid var(--border-subtle);
