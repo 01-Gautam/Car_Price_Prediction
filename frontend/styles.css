@@ -2033,3 +2033,122 @@ input,
 .footer-stat-value.visible {
     text-shadow: 0 0 15px rgba(230, 42, 50, 0.15);
 }
+
+/* ============================================================
+   36.  MOBILE RESPONSIVENESS (max-width: 768px)
+   ============================================================ */
+@media (max-width: 768px) {
+    /* Base typography & spacing */
+    :root {
+        --sp-3xl: 48px;
+        --sp-2xl: 32px;
+        --sp-xl: 24px;
+        --sp-lg: 16px;
+        --sp-md: 12px;
+        --sp-sm: 8px;
+    }
+
+    body {
+        font-size: 14px;
+    }
+
+    /* Headings */
+    .display-xl {
+        font-size: clamp(3rem, 10vw, 4rem);
+    }
+
+    .display-lg {
+        font-size: clamp(2.5rem, 8vw, 3.5rem);
+    }
+
+    /* Navbar */
+    .navbar {
+        flex-direction: column;
+        padding: var(--sp-sm) var(--sp-md);
+        gap: var(--sp-sm);
+        height: auto;
+    }
+    
+    .nav-links {
+        width: 100%;
+        justify-content: space-between;
+        gap: var(--sp-md);
+    }
+
+    .nav-link {
+        font-size: 0.65rem;
+    }
+
+    /* General Layout */
+    .band-mid, .band-large {
+        padding: var(--sp-2xl) var(--sp-md);
+    }
+
+    /* Landing Page Grid & Hero */
+    .hero-content {
+        padding-top: 120px;
+    }
+
+    .feature-grid {
+        grid-template-columns: 1fr;
+        gap: var(--sp-xl);
+    }
+
+    .how-step {
+        max-width: 100%;
+        margin-bottom: var(--sp-xl);
+    }
+
+    .arch-cards {
+        flex-direction: column;
+        gap: var(--sp-lg);
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: var(--sp-2xl);
+    }
+
+    .advantage-inner {
+        gap: var(--sp-xl);
+    }
+    
+    .advantage-sticky {
+        position: static;
+        margin-bottom: var(--sp-xl);
+    }
+
+    /* Dashboard Layout */
+    .dash-layout {
+        flex-direction: column;
+        padding-top: 80px; /* Account for mobile nav */
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+    }
+
+    .telemetry-form {
+        width: 100%;
+        max-width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-subtle);
+        padding: var(--sp-xl) var(--sp-md);
+    }
+
+    .val-stage {
+        width: 100%;
+        padding: var(--sp-2xl) var(--sp-md);
+        min-height: 500px;
+    }
+
+    /* Predict form layout */
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: var(--sp-lg);
+    }
+
+    /* Login Panel */
+    .auth-panel {
+        padding: var(--sp-xl) var(--sp-md);
+    }
+}
