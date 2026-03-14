@@ -7,8 +7,8 @@ class Settings:
     PROJECT_NAME='CAR Price Prediction'
     API_KEY=os.getenv('API_KEY', 'demo_key')
     JWT_SECRET_KEY=os.getenv('JWT_SECRET_KEY', 'Secret_key')
-    JWT_ALGORITHM='JS256'
+    JWT_ALGORITHM='HS256'
     REDIS_URL=os.getenv('REDIS_URL', 'redis://localhost:6379')
-    MODEL_PATH='app/models/model.joblib'
+    MODEL_PATH='app/models/models.joblib'
 
 settings=Settings()

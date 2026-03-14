@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Autovaluator — Institutional-grade ML automotive valuation engine. Submit vehicle telemetry for instant market-value predictions.">
+    <meta name="keywords" content="car price prediction, automotive valuation, machine learning, ML model, vehicle pricing India">
+    <title>Autovaluator — Precision Market Intelligence</title>
+    <link rel="stylesheet" href="/static/styles.css?v=2">
+</head>
+<body>
+
+    <!-- Page-load curtain -->
+    <div class="page-curtain" aria-hidden="true">
+        <div class="curtain-logo">
+            <span class="c-dot"></span>
+            AUTOVALUATOR
+        </div>
+    </div>
+
+    <!-- Cursor spotlight glow -->
+    <div class="cursor-spotlight" aria-hidden="true"></div>
+
+    <!-- Scroll progress bar -->
+    <div class="scroll-progress" aria-hidden="true">
+        <div class="scroll-progress-bar"></div>
+    </div>
+
+    <!-- Background System -->
+    <div class="site-bg"></div>
+    <div class="scan-grid"></div>
+    <div class="noise-overlay"></div>
+    <div class="vignette"></div>
+
+    <!-- ── Navigation ── -->
+    <header class="navbar" id="navbar">
+        <a href="/" class="brand">
+            <div class="brand-mark"></div>
+            AUTOVALUATOR
+        </a>
+        <nav class="nav-links">
+            <a href="#how-it-works" class="nav-link">How It Works</a>
+            <a href="https://github.com/01-Gautam/ML-Project" target="_blank" rel="noopener" class="nav-link">Methodology</a>
+            <a href="#architecture" class="nav-link">Architecture</a>
+            <div class="magnetic-btn-container">
+                <a href="/auth" class="cta-btn ghost">
+                    <span class="btn-label">
+                        <span>Access System</span>
+                    </span>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+
+    <main class="hero">
+
+        <!-- Full-bleed video background -->
+        <div class="hero-video-bg">
+            <video id="hero-vid-loop" muted playsinline aria-hidden="true">
+                <source src="/static/Smoke_from_Headlights_Not_Added.mp4" type="video/mp4">
+            </video>
+            <video id="hero-vid-main" autoplay muted playsinline aria-hidden="true">
+                <source src="/static/Car_Silhouette_Landing_Page_Video.mp4" type="video/mp4">
+            </video>
+        </div>
+        <div class="hero-overlay"></div>
+
+
+        <!-- Content layer -->
+        <div class="hero-content">
+
+            <!-- Solais-style beveled pill tag -->
+            <div class="hero-tag anim-reveal anim-delay-1" aria-label="AI Used Car Valuation">
+                <span class="hero-tag-dot"></span>
+                ML Powered Car Valuation
+            </div>
+
+            <h1 class="hero-heading">
+                <!-- Hollow Silver 'Smart Car' -->
+                <span class="anim-reveal anim-delay-2" style="color: transparent; -webkit-text-stroke: 2px rgba(255, 255, 255, 0.75);">Smart Car</span>
+                <!-- Hollow Crimson 'Valuation.' -->
+                <span class="line-accent anim-reveal anim-delay-3" style="color: transparent; -webkit-text-stroke: 2px var(--crimson);">Valuation.</span>
+            </h1>
+
+            <p class="hero-subtitle anim-reveal anim-delay-4">
+                Get an instant, data-driven price estimate for your car.
+                Powered by a machine learning model trained on thousands of real past sales.
+            </p>
+
+            <div class="anim-reveal anim-delay-5" style="position: relative; z-index: 2;">
+                <div class="magnetic-btn-container">
+                    <a href="/auth" class="cta-btn" id="main-cta">
+                        <span class="btn-label">
+                            <span>Get Instant Valuation</span>
+                            <span class="btn-arrow">&rarr;</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- KPI Strip -->
+            <div class="kpi-strip anim-reveal anim-delay-6">
+                <div class="kpi-item">
+                    <span class="kpi-value">94<span class="kpi-unit">%</span></span>
+                    <span class="kpi-label">Accuracy</span>
+                </div>
+                <div class="kpi-item">
+                    <span class="kpi-value">31<span class="kpi-unit">+</span></span>
+                    <span class="kpi-label">Brands Indexed</span>
+                </div>
+                <div class="kpi-item">
+                    <span class="kpi-value">12<span class="kpi-unit"></span></span>
+                    <span class="kpi-label">Car Features Examined</span>
+                </div>
+            </div>
+
+        </div>
+
+
+    </main>
+
+    <!-- ================================================================
+         MARQUEE TICKER — Solais-style continuous data strip
+         ================================================================ -->
+    <div class="marquee-band" aria-hidden="true">
+        <div class="marquee-viewport">
+
+            <!-- Track 1 (duplicated for seamless loop) -->
+            <div class="marquee-track">
+                <span class="marquee-item"><span class="mi-accent">94.2%</span>&ensp;Accuracy Rate</span>
+                <span class="marquee-item"><span class="mi-accent">31</span>&ensp;Brands Supported</span>
+                <span class="marquee-item"><span class="mi-accent">12</span>&ensp;Car Features Examined</span>
+                <span class="marquee-item"><span class="mi-accent">Instant</span>&ensp;Price Estimations</span>
+                <span class="marquee-item"><span class="mi-accent">Random Forest</span>&ensp;Machine Learning</span>
+                <span class="marquee-item"><span class="mi-accent">Data-Driven</span>&ensp;Market Insights</span>
+                <span class="marquee-item"><span class="mi-accent">Thousands Of</span>&ensp;Past Sales Analyzed</span>
+                <span class="marquee-item"><span class="mi-accent">94.2%</span>&ensp;Accuracy Rate</span>
+                <span class="marquee-item"><span class="mi-accent">31</span>&ensp;Brands Supported</span>
+                <span class="marquee-item"><span class="mi-accent">12</span>&ensp;Car Features Examined</span>
+                <span class="marquee-item"><span class="mi-accent">Instant</span>&ensp;Price Estimations</span>
+                <span class="marquee-item"><span class="mi-accent">Random Forest</span>&ensp;Machine Learning</span>
+                <span class="marquee-item"><span class="mi-accent">Data-Driven</span>&ensp;Market Insights</span>
+                <span class="marquee-item"><span class="mi-accent">Thousands Of</span>&ensp;Past Sales Analyzed</span>
+            </div>
+
+            <!-- Track 2 (offset for seamless loop) -->
+            <div class="marquee-track">
+                <span class="marquee-item"><span class="mi-accent">94.2%</span>&ensp;Accuracy Rate</span>
+                <span class="marquee-item"><span class="mi-accent">31</span>&ensp;Brands Supported</span>
+                <span class="marquee-item"><span class="mi-accent">12</span>&ensp;Car Features Examined</span>
+                <span class="marquee-item"><span class="mi-accent">Instant</span>&ensp;Price Estimations</span>
+                <span class="marquee-item"><span class="mi-accent">Random Forest</span>&ensp;Machine Learning</span>
+                <span class="marquee-item"><span class="mi-accent">Data-Driven</span>&ensp;Market Insights</span>
+                <span class="marquee-item"><span class="mi-accent">Thousands Of</span>&ensp;Past Sales Analyzed</span>
+                <span class="marquee-item"><span class="mi-accent">94.2%</span>&ensp;Accuracy Rate</span>
+                <span class="marquee-item"><span class="mi-accent">31</span>&ensp;Brands Supported</span>
+                <span class="marquee-item"><span class="mi-accent">12</span>&ensp;Car Features Examined</span>
+                <span class="marquee-item"><span class="mi-accent">Instant</span>&ensp;Price Estimations</span>
+                <span class="marquee-item"><span class="mi-accent">Random Forest</span>&ensp;Machine Learning</span>
+                <span class="marquee-item"><span class="mi-accent">Data-Driven</span>&ensp;Market Insights</span>
+                <span class="marquee-item"><span class="mi-accent">Thousands Of</span>&ensp;Past Sales Analyzed</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ================================================================
+         HOW IT WORKS — 3-step numbered process (Solais-inspired)
+         ================================================================ -->
+    <section id="how-it-works" class="band-mid how-section" aria-label="How Autovaluator works">
+
+        <div class="how-header">
+            <div>
+                <div class="eyebrow" style="margin-bottom: 1.2rem;">How It Works (02)</div>
+                <h2 class="display-lg">Find Your Car's<br><span class="accent-teal" style="font-style:italic;">True Value.</span></h2>
+            </div>
+            <p class="how-desc">
+                No dealership visits. No estimating. Just enter your car's basic details 
+                and get an accurate market price instantly—powered by an AI model 
+                trained on thousands of verified car sales across India.
+            </p>
+        </div>
+
+        <div class="how-grid">
+
+            <div class="how-step">
+                <div class="step-head">
+                    <span class="step-num">01</span>
+                    <span class="step-dot"></span>
+                </div>
+                <h3>Enter Your<br>Car Details</h3>
+                <p>
+                    Fill in basic information about your car — brand, year,
+                    how many kilometres it has been driven, fuel type, and
+                    a few engine specs. It takes less than two minutes.
+                </p>
+            </div>
+
+            <div class="how-step">
+                <div class="step-head">
+                    <span class="step-num">02</span>
+                    <span class="step-dot"></span>
+                </div>
+                <h3>Our Model<br>Analyses It</h3>
+                <p>
+                    Our AI compares your car against thousands of real
+                    transactions using 12 data points — brand, age, mileage,
+                    power, fuel type and more — to find the most accurate
+                    market price for your specific car.
+                </p>
+            </div>
+
+            <div class="how-step">
+                <div class="step-head">
+                    <span class="step-num">03</span>
+                    <span class="step-dot"></span>
+                </div>
+                <h3>Get Your<br>Price Instantly</h3>
+                <p>
+                    You receive a fair market price estimate with 94%
+                    accuracy — useful whether you are buying, selling,
+                    or just want to know what your car is worth today.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Teal separator line -->
+    <div class="band-teal-line" aria-hidden="true"></div>
+
+    <!-- ================================================================
+         STICKY ADVANTAGE STORY — Solais scroll storytelling
+         ================================================================ -->
+    <section class="advantage-section band-dark" aria-label="System advantages">
+        <div class="advantage-inner">
+
+            <!-- STICKY LEFT: heading stays while right scrolls -->
+            <div class="advantage-sticky">
+                <div class="eyebrow" style="margin-bottom: var(--sp-md);">Why It Works (03)</div>
+                <h2>Why<br>You Can<br><span class="accent-teal" style="font-style:italic;">Trust It.</span></h2>
+                <p class="adv-sticky-sub" style="margin-top: var(--sp-md);">
+                    Three reasons why our machine learning model provides 
+                    more reliable price estimates than a quick Google search or a dealer quote.
+                </p>
+            </div>
+
+            <!-- SCROLLING RIGHT: 3 benefit blocks -->
+            <div class="advantage-scroll">
+
+                <div class="adv-block">
+                    <div class="adv-num">Reason / 01</div>
+                    <h3>Trained on<br>Real Sales Data</h3>
+                    <p>
+                        The model was built using thousands of actual used car sales
+                        across India. Not guesses, not dealer estimates. This means 
+                        the price prediction reflects what your car would actually 
+                        sell for today.
+                    </p>
+                </div>
+
+                <div class="adv-block">
+                    <div class="adv-num">Reason / 02</div>
+                    <h3>Smart ML<br>Regression</h3>
+                    <p>
+                        Our Random Forest algorithm doesn't just look at the age of the car. 
+                        It calculates the complex relationship between 12 distinct points—like engine CC, 
+                        fuel type, maximum power, and torque—to find an incredibly accurate baseline.
+                    </p>
+                </div>
+
+                <div class="adv-block">
+                    <div class="adv-num">Reason / 03</div>
+                    <h3>Instant &amp;<br>Free Access</h3>
+                    <p>
+                        There are no appointments, no waiting for a dealer to call back, 
+                        and no hidden fees. Enter your basic vehicle specifications and get 
+                        a data-driven price estimation in under a second.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Teal separator line -->
+    <div class="band-teal-line" aria-hidden="true"></div>
+
+    <!-- ================================================================
+         ARCHITECTURE / CARDS — Neural Ensemble section
+         ================================================================ -->
+    <section id="architecture" class="band-mid" aria-label="How the AI model works">
+        <div class="section-wrap">
+
+            <div class="section-header">
+                <div>
+                    <div class="eyebrow" style="margin-bottom: 1.2rem;">Under the Hood (04)</div>
+                    <h2 class="display-lg">How the<br><span class="accent-teal" style="font-style:italic;">AI Works.</span></h2>
+                </div>
+                <p class="section-intro text-secondary">
+                    You don't need to be a data scientist to use our tool —
+                    but if you're curious how we calculate your price, here's the plain-English version.
+                </p>
+            </div>
+
+            <!-- Beveled clip-path cards -->
+            <div class="cards-grid">
+
+                <article class="p-card clip-card">
+                    <span class="p-index">No. 01</span>
+                    <div class="p-content">
+                        <h3>It Learns from<br>Past Sales</h3>
+                        <p>The AI studied thousands of used car transactions in India to learn the patterns behind car pricing — which features raise the price, which lower it, and by how much.</p>
+                    </div>
+                </article>
+
+                <article class="p-card clip-card" style="transition-delay: 0.1s;">
+                    <span class="p-index">No. 02</span>
+                    <div class="p-content">
+                        <h3 class="accent-teal">It Checks<br>12 Factors</h3>
+                        <p>Brand, year, mileage, fuel type, transmission, number of owners, engine power, torque, engine size, fuel efficiency, seller type, and seating — all at once, not one by one.</p>
+                    </div>
+                </article>
+
+                <article class="p-card clip-card" style="transition-delay: 0.2s;">
+                    <span class="p-index">No. 03</span>
+                    <div class="p-content">
+                        <h3>It Gives You<br>a Fair Price</h3>
+                        <p>By comparing your car to similar ones that actually sold, it produces an estimated price that is 94% accurate — an honest benchmark, not a dealer's wishful asking price.</p>
+                    </div>
+                </article>
+
+            </div>
+
+        </div>
+    </section>
+
+
+    <!-- Teal separator line -->
+    <div class="band-teal-line" aria-hidden="true"></div>
+
+    <!-- ================================================================
+         FOOTER — Solais-style expanded CTA footer
+         ================================================================ -->
+    <footer class="band-dark" role="contentinfo">
+
+        <div class="site-footer-full">
+
+            <!-- Left: Brand CTA statement -->
+            <div class="footer-left">
+                <h2>Predicting<br>Fair Value<span class="accent-teal">.</span></h2>
+                <p>
+                    Smart market intelligence for the used car sector.
+                    Submit your vehicle specifications and receive a data-backed
+                    price estimation in under a second.
+                </p>
+                <div class="magnetic-btn-container">
+                    <a href="/auth" class="cta-btn ghost">
+                        <span class="btn-label">
+                            <span>Initiate Valuation</span>
+                            <span class="btn-arrow">&rarr;</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right: System stats -->
+            <div class="footer-right" style="display: flex; flex-direction: column; justify-content: flex-end;">
+                <div class="footer-stat-grid">
+                    <div class="footer-stat-item">
+                        <div class="footer-stat-value">94<span class="fs-accent">%</span></div>
+                        <div class="footer-stat-label">Model Confidence</div>
+                    </div>
+                    <div class="footer-stat-item">
+                        <div class="footer-stat-value">31<span class="fs-accent">+</span></div>
+                        <div class="footer-stat-label">Manufacturers</div>
+                    </div>
+                    <div class="footer-stat-item">
+                        <div class="footer-stat-value">12<span class="fs-accent">×</span></div>
+                        <div class="footer-stat-label">Analysis Vectors</div>
+                    </div>
+                    <div class="footer-stat-item">
+                        <div class="footer-stat-value">&lt;1<span class="fs-accent">s</span></div>
+                        <div class="footer-stat-label">Prediction Latency</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Legal bar -->
+        <div class="footer-legal-bar">
+            <div class="footer-legal-links">
+                <a href="https://github.com/01-Gautam/ML-Project" target="_blank" rel="noopener">Methodology</a>
+                <a href="#architecture">Architecture</a>
+                <a href="/auth">Access System</a>
+            </div>
+        </div>
+
+    </footer>
+
+    <script src="/static/app.js"></script>
+    <script>
+        /* ── Advantage blocks observer ───────────────────────── */
+        document.addEventListener('DOMContentLoaded', () => {
+            const advObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry, i) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => entry.target.classList.add('visible'), i * 120);
+                        advObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15 });
+
+            document.querySelectorAll('.adv-block').forEach(el => advObserver.observe(el));
+
+            /* ── How-step entrance ───────────────────────────── */
+            const howObserver = new IntersectionObserver((entries) => {
+                entries.forEach((entry, i) => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.transitionDelay = `${i * 0.12}s`;
+                        entry.target.classList.add('visible');
+                        howObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.how-step').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(24px)';
+                el.style.transition = 'opacity 0.8s cubic-bezier(0.19,1,0.22,1), transform 0.8s cubic-bezier(0.19,1,0.22,1)';
+                howObserver.observe(el);
+            });
+
+            /* Add visible class for how-steps */
+            const howStyle = document.createElement('style');
+            howStyle.textContent = '.how-step.visible { opacity: 1 !important; transform: translateY(0) !important; }';
+            document.head.appendChild(howStyle);
+            /* ── Hero Video Seamless Swap ─────────────────────── */
+            const mainVid = document.getElementById('hero-vid-main');
+            const loopVid = document.getElementById('hero-vid-loop');
+            const overlay = document.querySelector('.hero-overlay');
+            let hasSwapped = false;
+
+            if (mainVid && loopVid && overlay) {
+                // Keep loop video paused at the 2s mark
+                loopVid.pause();
+                loopVid.currentTime = 2;
+                
+                // Gentle dim for loop restart (lighter than initial transition)
+                let isLoopRestarting = false;
+                loopVid.addEventListener('timeupdate', () => {
+                    if (!isLoopRestarting && loopVid.duration > 0 && loopVid.currentTime > loopVid.duration - 2) {
+                        isLoopRestarting = true;
+                        
+                        // Phase 1: Very gentle dim (1.8s CSS transition)
+                        overlay.classList.add('loop-dimming');
+                        
+                        // Phase 2: After dim settles, restart invisibly
+                        setTimeout(() => {
+                            loopVid.pause();
+                            loopVid.currentTime = 2;
+                            loopVid.addEventListener('seeked', function onSeeked() {
+                                loopVid.removeEventListener('seeked', onSeeked);
+                                loopVid.play().catch(e => console.log("Loop replay blocked", e));
+                                
+                                // Phase 3: Hold briefly, then gently fade back
+                                setTimeout(() => {
+                                    overlay.classList.remove('loop-dimming');
+                                    isLoopRestarting = false;
+                                }, 400);
+                            });
+                        }, 1800);
+                    }
+                });
+                
+                mainVid.addEventListener('timeupdate', () => {
+                    // 3 seconds before the main video ends, start the slow dim
+                    if (!hasSwapped && mainVid.duration > 0 && mainVid.currentTime > mainVid.duration - 3) {
+                        hasSwapped = true;
+                        
+                        // Phase 1: Dim overlay to full black (2.5s CSS transition)
+                        overlay.classList.add('dimming');
+                        
+                        // Phase 2: After 2.5s (overlay is now fully black), do the invisible swap
+                        setTimeout(() => {
+                            mainVid.pause();
+                            mainVid.style.display = 'none';
+                            loopVid.play().catch(e => console.log("Loop play blocked", e));
+                            
+                            // Phase 3: After a brief hold (300ms), fade overlay back to normal
+                            setTimeout(() => {
+                                overlay.classList.remove('dimming');
+                            }, 300);
+                        }, 2500);
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>

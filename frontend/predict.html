@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Autovaluator — Predictive Engine Dashboard. Submit vehicle specs for instant ML-powered price valuation.">
+    <title>Predictive Engine — Autovaluator</title>
+    <link rel="stylesheet" href="/static/styles.css?v=2">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        /* ── Dashboard Layout ──────────────────────────────────── */
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Cockpit uses the new class name but we keep the old
+           .dashboard-layout for any render path that uses it */
+        .cockpit-wrapper,
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            flex: 1;
+        }
+
+        @media (max-width: 1024px) {
+
+            .cockpit-wrapper,
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ── Control Panel (left) ──────────────────────────────── */
+        .control-panel {
+            border-right: 1px solid var(--border-subtle);
+            padding: var(--sp-lg);
+            background: var(--bg-surface);
+            overflow-y: auto;
+            height: calc(100vh - 68px);
+            position: sticky;
+            top: 68px;
+        }
+
+        @media (max-width: 1024px) {
+            .control-panel {
+                height: auto;
+                position: static;
+                border-right: none;
+                border-bottom: 1px solid var(--border-subtle);
+            }
+        }
+
+        .control-panel-header {
+            margin-bottom: var(--sp-lg);
+            padding-bottom: var(--sp-md);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .control-panel-header h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-style: italic;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        /* ── Result Stage (right) ──────────────────────────────── */
+        .val-stage {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--sp-xl);
+            background: radial-gradient(circle at 50% 40%, rgba(0, 229, 195, 0.045), transparent 55%);
+            position: relative;
+            min-height: calc(100vh - 68px);
+            overflow: hidden; /* Contain the WebGL canvas */
+        }
+
+        /* Cosmic Dust WebGL container */
+        #dust-shader-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+        #dust-shader-bg canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        /* Ensure content sits above the dust */
+        .val-stage > *:not(#dust-shader-bg):not(.stage-scan) {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── Submit button ─────────────────────────────────────── */
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--bg-base);
+            background: var(--crimson);
+            border: 1px solid var(--crimson);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: color 0.45s var(--ease-out-expo), border-color 0.45s;
+        }
+
+        .submit-btn-inner {
+            position: relative;
+            z-index: 2;
+        }
+
+        .submit-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--bg-base);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.55s var(--ease-in-out);
+            z-index: 1;
+        }
+
+        .submit-btn:hover {
+            color: var(--crimson);
+            border-color: var(--crimson);
+        }
+
+        .submit-btn:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.45;
+            pointer-events: none;
+        }
+
+        /* ── Empty state ───────────────────────────────────────── */
+        .result-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: var(--sp-md);
+            color: var(--text-tertiary);
+            font-family: var(--font-mono);
+            font-size: 0.68rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            text-align: center;
+            min-height: 360px;
+        }
+
+        .result-empty svg {
+            width: 64px;
+            height: 64px;
+            animation: crosshairSpin 18s linear infinite;
+            opacity: 0.5;
+        }
+
+        /* ── Loading state ─────────────────────────────────────── */
+        .result-loading-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--sp-md);
+            min-height: 360px;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            letter-spacing: 0.14em;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+        }
+
+        /* ── Price display panel ───────────────────────────────── */
+        .price-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--sp-md);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .price-eyebrow-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--crimson);
+        }
+
+        .price-eyebrow-row .line {
+            flex: 1;
+            height: 1px;
+            background: var(--border-subtle);
+            width: 36px;
+        }
+
+        .final-price {
+            font-family: var(--font-display);
+            font-size: clamp(3.5rem, 8vw, 6rem);
+            font-weight: 800;
+            font-style: italic;
+            text-transform: uppercase;
+            line-height: 1;
+            color: var(--text-primary);
+            transition: color 0.6s ease, text-shadow 0.6s ease;
+        }
+
+        .final-price.glow {
+            color: var(--crimson);
+            text-shadow: 0 0 50px rgba(0, 229, 195, 0.45);
+        }
+
+        .conf-badge {
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--crimson);
+            border: 1px solid var(--teal-border);
+            padding: 4px 16px;
+        }
+
+        .meta-table {
+            width: 100%;
+            border-top: 1px solid var(--border-subtle);
+            padding-top: var(--sp-md);
+            margin-top: var(--sp-sm);
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 9px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+        }
+
+        .meta-row:last-child {
+            border-bottom: none;
+        }
+
+        .meta-row .meta-key {
+            color: var(--text-tertiary);
+            letter-spacing: 0.08em;
+        }
+
+        .meta-row .meta-val {
+            color: var(--text-primary);
+        }
+
+        /* Teal vertical scan bar on the result stage */
+        .stage-scan {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: linear-gradient(180deg,
+                    transparent 0%,
+                    var(--teal-dim) 30%,
+                    rgba(0, 229, 195, 0.6) 50%,
+                    var(--teal-dim) 70%,
+                    transparent 100%);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Cursor spotlight -->
+    <div class="cursor-spotlight" aria-hidden="true"></div>
+
+    <!-- Background System -->
+    <div class="site-bg"></div>
+    <div class="scan-grid"></div>
+    <div class="noise-overlay"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar scrolled" role="navigation" aria-label="Dashboard navigation">
+        <a href="/" class="brand">
+            <div class="brand-mark"></div>
+            AUTOVALUATOR<span class="text-tertiary" style="margin-left: 4px;"></span>
+        </a>
+        <div class="nav-links" style="align-items: center;">
+            <span
+                style="font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.12em; color: var(--text-tertiary); text-transform: uppercase;">
+                User:&nbsp;<span id="user-name" style="color: var(--crimson);">ADMIN</span>
+            </span>
+            <button onclick="handleLogout()" class="nav-link" style="background: none; border: none; cursor: pointer;"
+                aria-label="Log out">Terminate Session</button>
+        </div>
+    </nav>
+
+    <!-- Cockpit Layout -->
+    <div class="cockpit-wrapper" style="padding-top: 68px; flex: 1;">
+
+        <!-- ── LEFT: Control Panel ── -->
+        <aside class="control-panel glass-panel fade-up" aria-label="Vehicle specification input">
+
+            <div class="control-panel-header">
+                <h2>Enter<br>Car Details</h2>
+                <p class="label-teal" style="margin-top: 8px;">FILL IN YOUR VEHICLE INFORMATION BELOW</p>
+            </div>
+
+            <form id="prediction-form" novalidate>
+                <div class="specs-grid">
+
+                    <!-- Manufacturer -->
+                    <div class="luxury-form-group">
+                        <div class="custom-dropdown" id="dd-company" aria-label="Select Car Brand">
+                            <div class="dropdown-trigger" role="button" tabindex="0" aria-haspopup="listbox"
+                                aria-expanded="false">Car Brand</div>
+                            <div class="dropdown-menu" role="listbox"></div>
+                        </div>
+                        <input type="hidden" id="pred-company" required>
+                    </div>
+
+                    <!-- Year -->
+                    <div class="luxury-form-group">
+                        <input type="number" id="pred-year" class="luxury-input" placeholder=" " min="1990" max="2026"
+                            required aria-label="Year of manufacture">
+                        <label class="luxury-label" for="pred-year">YEAR OF PURCHASE</label>
+                    </div>
+
+                    <!-- Ownership -->
+                    <div class="luxury-form-group">
+                        <div class="custom-dropdown" id="dd-owner" aria-label="Select Number of Owners">
+                            <div class="dropdown-trigger" role="button" tabindex="0" aria-haspopup="listbox"
+                                aria-expanded="false">Owner Type</div>
+                            <div class="dropdown-menu" role="listbox"></div>
+                        </div>
+                        <input type="hidden" id="pred-owner" required>
+                    </div>
+
+                    <!-- Fuel -->
+                    <div class="luxury-form-group">
+                        <div class="custom-dropdown" id="dd-fuel" aria-label="Select Fuel Type">
+                            <div class="dropdown-trigger" role="button" tabindex="0" aria-haspopup="listbox"
+                                aria-expanded="false">Fuel Type</div>
+                            <div class="dropdown-menu" role="listbox"></div>
+                        </div>
+                        <input type="hidden" id="pred-fuel" required>
+                    </div>
+
+                    <!-- Seller -->
+                    <div class="luxury-form-group">
+                        <div class="custom-dropdown" id="dd-seller" aria-label="Select Seller Type">
+                            <div class="dropdown-trigger" role="button" tabindex="0" aria-haspopup="listbox"
+                                aria-expanded="false">Sold By</div>
+                            <div class="dropdown-menu" role="listbox"></div>
+                        </div>
+                        <input type="hidden" id="pred-seller" required>
+                    </div>
+
+                    <!-- Transmission -->
+                    <div class="luxury-form-group">
+                        <div class="custom-dropdown" id="dd-transmission" aria-label="Select Transmission">
+                            <div class="dropdown-trigger" role="button" tabindex="0" aria-haspopup="listbox"
+                                aria-expanded="false">Transmission</div>
+                            <div class="dropdown-menu" role="listbox"></div>
+                        </div>
+                        <input type="hidden" id="pred-transmission" required>
+                    </div>
+
+                    <!-- Numeric fields -->
+                    <div class="luxury-form-group">
+                        <input type="number" id="pred-km" class="luxury-input" placeholder=" " min="0" required
+                            aria-label="Total kilometers driven">
+                        <label class="luxury-label" for="pred-km">TOTAL KM DRIVEN</label>
+                    </div>
+
+                    <div class="luxury-form-group">
+                        <input type="number" id="pred-mileage" class="luxury-input" placeholder=" " step="0.1" required
+                            aria-label="Fuel efficiency in km per litre">
+                        <label class="luxury-label" for="pred-mileage">MILEAGE (KM/L)</label>
+                    </div>
+
+                    <div class="luxury-form-group">
+                        <input type="number" id="pred-engine" class="luxury-input" placeholder=" " step="0.1" required
+                            aria-label="Engine size in cubic centimetres">
+                        <label class="luxury-label" for="pred-engine">ENGINE SIZE (CC)</label>
+                    </div>
+
+                    <div class="luxury-form-group">
+                        <input type="number" id="pred-power" class="luxury-input" placeholder=" " step="0.1" required
+                            aria-label="Engine power in horsepower">
+                        <label class="luxury-label" for="pred-power">ENGINE POWER (HP)</label>
+                    </div>
+
+                    <div class="luxury-form-group">
+                        <input type="number" id="pred-torque" class="luxury-input" placeholder=" " step="0.1" required
+                            aria-label="Engine torque in Newton-metres">
+                        <label class="luxury-label" for="pred-torque">TORQUE (NM) — PULLING FORCE</label>
+                    </div>
+
+                    <div class="luxury-form-group">
+                        <input type="number" id="pred-seats" class="luxury-input" placeholder=" " min="2" max="10"
+                            required aria-label="Seating capacity">
+                        <label class="luxury-label" for="pred-seats">SEATING CAPACITY</label>
+                    </div>
+
+                </div>
+
+                <div style="margin-top: var(--sp-xl);">
+                    <div class="magnetic-btn-container" style="width: 100%;">
+                        <button type="submit" class="cta-btn" id="submit-btn" style="width: 100%;">
+                            <span class="btn-label">
+                                <span>GET ESTIMATED PRICE</span>
+                                <span class="btn-arrow">&rarr;</span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+        </aside>
+
+        <!-- ── RIGHT: Result Stage ── -->
+        <section class="val-stage" aria-label="Valuation result" aria-live="polite">
+            <div class="stage-scan"></div>
+            <!-- Deep Cosmic Dust WebGL Background -->
+            <div id="dust-shader-bg"></div>
+
+            <!-- Empty state -->
+            <div id="result-empty" class="result-empty">
+                <svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="0.6" aria-hidden="true">
+                    <circle cx="50" cy="50" r="44" opacity="0.2" />
+                    <circle cx="50" cy="50" r="30" opacity="0.3" />
+                    <path d="M50 20v60M20 50h60" opacity="0.35" />
+                    <circle cx="50" cy="50" r="5" fill="currentColor" opacity="0.6" />
+                    <path d="M35 35l30 30M65 35L35 65" opacity="0.15" />
+                </svg>
+                STANDBY FOR DATA INGESTION
+            </div>
+
+            <!-- Loading state -->
+            <div id="result-loading" class="result-loading-wrap hidden">
+                <div class="scan-loading" style="width:160px; margin: 0 auto;"></div>
+                <span style="margin-top: var(--sp-md);">RESOLVING NEURAL WEIGHTS&hellip;</span>
+            </div>
+
+            <!-- Result content -->
+            <div id="result-content" class="price-display hidden">
+
+                <div class="price-eyebrow-row">
+                    <span class="line"></span>
+                    ESTIMATED ASSET VALUE
+                    <span class="line"></span>
+                </div>
+
+                <div class="final-price" id="price-value" aria-live="assertive">0</div>
+
+                <div class="conf-badge">CONFIDENCE&ensp;94.2%</div>
+
+                <div class="meta-table">
+                    <div class="meta-row">
+                        <span class="meta-key">Subject</span>
+                        <span class="meta-val" id="res-brand">---</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-key">Vintage</span>
+                        <span class="meta-val" id="res-year">---</span>
+                    </div>
+                    <div class="meta-row">
+                        <span class="meta-key">Odometer</span>
+                        <span class="meta-val" id="res-km">---</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </div>
+
+    <script src="/static/app.js"></script>
+    <script>
+        /* ── Deep Cosmic Dust WebGL Background (val-stage) ─────────── */
+        (function() {
+            const container = document.getElementById('dust-shader-bg');
+            if (!container) return;
+
+            const scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x080808, 0.003);
+
+            const camera = new THREE.PerspectiveCamera(60, 1, 1, 1000);
+            camera.position.z = 200;
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setClearColor(0x000000, 0); // Transparent so stage bg gradient shows
+            container.appendChild(renderer.domElement);
+
+            let mouseX = 0.5, mouseY = 0.5;
+            window.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX / window.innerWidth;
+                mouseY = 1.0 - (e.clientY / window.innerHeight);
+            });
+
+            const count = 3000;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(count * 3);
+            const sizes = new Float32Array(count);
+
+            for (let i = 0; i < count; i++) {
+                positions[i * 3] = (Math.random() - 0.5) * 600;
+                positions[i * 3 + 1] = (Math.random() - 0.5) * 600;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 600;
+                sizes[i] = Math.random() * 2.0 + 0.5;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+            const material = new THREE.ShaderMaterial({
+                uniforms: {
+                    color: { value: new THREE.Color(0xE62A32) }
+                },
+                vertexShader: `
+                    attribute float size;
+                    varying float vDepth;
+                    void main() {
+                        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                        gl_PointSize = size * (300.0 / -mvPosition.z);
+                        gl_Position = projectionMatrix * mvPosition;
+                        vDepth = -mvPosition.z;
+                    }
+                `,
+                fragmentShader: `
+                    uniform vec3 color;
+                    varying float vDepth;
+                    void main() {
+                        vec2 xy = gl_PointCoord.xy - vec2(0.5);
+                        float ll = length(xy);
+                        if (ll > 0.5) discard;
+                        float alpha = (0.5 - ll) * 2.0;
+                        alpha *= exp(-vDepth * 0.002);
+                        gl_FragColor = vec4(color, alpha * 0.6);
+                    }
+                `,
+                transparent: true,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false
+            });
+
+            const points = new THREE.Points(geometry, material);
+            scene.add(points);
+
+            function resizeDust() {
+                const rect = container.getBoundingClientRect();
+                renderer.setSize(rect.width, rect.height);
+                camera.aspect = rect.width / rect.height;
+                camera.updateProjectionMatrix();
+            }
+            resizeDust();
+            window.addEventListener('resize', resizeDust);
+
+            function render() {
+                requestAnimationFrame(render);
+                const time = Date.now() * 0.0001;
+                points.rotation.y = time;
+                points.rotation.x = time * 0.5;
+                camera.position.x += ((mouseX - 0.5) * 100 - camera.position.x) * 0.05;
+                camera.position.y += (-(mouseY - 0.5) * 100 - camera.position.y) * 0.05;
+                camera.lookAt(scene.position);
+                renderer.render(scene, camera);
+            }
+            render();
+        })();
+    </script>
+    <script>
+        /* ── Dropdown Data ─────────────────────────────────────────── */
+        const dropdownData = {
+            'dd-company': {
+                options: ['Maruti', 'Skoda', 'Honda', 'Hyundai', 'Toyota', 'Ford', 'Renault',
+                    'Mahindra', 'Tata', 'Chevrolet', 'Datsun', 'Jeep', 'Mercedes-Benz',
+                    'Mitsubishi', 'Audi', 'Volkswagen', 'BMW', 'Nissan', 'Lexus',
+                    'Jaguar', 'Land', 'MG', 'Volvo', 'Daewoo', 'Kia', 'Fiat',
+                    'Force', 'Ambassador', 'Ashok', 'Isuzu', 'Opel'].sort(),
+                inputId: 'pred-company'
+            },
+            'dd-owner': {
+                options: ['First', 'Second', 'Third', 'Fourth & Above', 'Test Drive Car'],
+                inputId: 'pred-owner'
+            },
+            'dd-fuel': {
+                options: ['Petrol', 'Diesel', 'CNG', 'LPG', 'Electric'],
+                inputId: 'pred-fuel'
+            },
+            'dd-seller': {
+                options: ['Individual', 'Dealer', 'Trustmark Dealer'],
+                inputId: 'pred-seller'
+            },
+            'dd-transmission': {
+                options: ['Manual', 'Automatic'],
+                inputId: 'pred-transmission'
+            }
+        };
+
+        function initDropdown(id) {
+            const container = document.getElementById(id);
+            const trigger = container.querySelector('.dropdown-trigger');
+            const menu = container.querySelector('.dropdown-menu');
+            const data = dropdownData[id];
+            const input = document.getElementById(data.inputId);
+
+            data.options.forEach(opt => {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item';
+                item.textContent = opt;
+                item.setAttribute('role', 'option');
+                item.onclick = () => {
+                    input.value = opt;
+                    trigger.textContent = opt;
+                    trigger.setAttribute('aria-expanded', 'false');
+                    container.classList.remove('open');
+                };
+                menu.appendChild(item);
+            });
+
+            trigger.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const isOpen = container.classList.contains('open');
+                document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('open'));
+                if (!isOpen) {
+                    container.classList.add('open');
+                    trigger.setAttribute('aria-expanded', 'true');
+                }
+            };
+
+            trigger.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    trigger.click();
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            /* ── Auth check ── */
+            const token = localStorage.getItem('autovaluator_token');
+            const user = localStorage.getItem('autovaluator_user');
+            if (!token) {
+                window.location.href = '/auth';
+                return;
+            }
+            if (user) {
+                document.getElementById('user-name').textContent = user.toUpperCase();
+            }
+
+            /* ── Init dropdowns ── */
+            Object.keys(dropdownData).forEach(initDropdown);
+
+            /* ── Close dropdowns on outside click ── */
+            document.addEventListener('click', () => {
+                document.querySelectorAll('.custom-dropdown').forEach(d => d.classList.remove('open'));
+            });
+
+            /* ── Form submission ── */
+            document.getElementById('prediction-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const formData = {
+                    company: document.getElementById('pred-company').value,
+                    year: parseInt(document.getElementById('pred-year').value),
+                    owner: document.getElementById('pred-owner').value,
+                    fuel: document.getElementById('pred-fuel').value,
+                    seller_type: document.getElementById('pred-seller').value,
+                    transmission: document.getElementById('pred-transmission').value,
+                    km_driven: parseInt(document.getElementById('pred-km').value),
+                    mileage_mpg: parseFloat(document.getElementById('pred-mileage').value),
+                    engine_cc: parseFloat(document.getElementById('pred-engine').value),
+                    max_power_bhp: parseFloat(document.getElementById('pred-power').value),
+                    torque_nm: parseFloat(document.getElementById('pred-torque').value),
+                    seats: parseFloat(document.getElementById('pred-seats').value)
+                };
+
+                /* Validate all fields */
+                const missingDropdowns = !formData.company || !formData.owner || !formData.fuel ||
+                    !formData.seller_type || !formData.transmission;
+                const missingNumeric = isNaN(formData.year) || isNaN(formData.km_driven) ||
+                    isNaN(formData.mileage_mpg) || isNaN(formData.engine_cc) ||
+                    isNaN(formData.max_power_bhp) || isNaN(formData.torque_nm) || isNaN(formData.seats);
+
+                if (missingDropdowns || missingNumeric) {
+                    // Show inline error
+                    let errDiv = document.getElementById('form-error');
+                    if (!errDiv) {
+                        errDiv = document.createElement('div');
+                        errDiv.id = 'form-error';
+                        errDiv.style.cssText = 'margin-top: var(--sp-md); padding: 10px 16px; background: rgba(230,42,50,0.12); border: 1px solid rgba(230,42,50,0.3); border-radius: 6px; font-family: var(--font-mono); font-size: 0.7rem; color: var(--crimson); letter-spacing: 0.08em; text-align: center;';
+                        document.getElementById('prediction-form').appendChild(errDiv);
+                    }
+                    errDiv.textContent = 'PLEASE FILL ALL FIELDS BEFORE SUBMITTING';
+                    errDiv.style.opacity = '1';
+                    errDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    setTimeout(() => { if(errDiv) errDiv.style.opacity = '0.5'; }, 3000);
+                    return;
+                }
+
+                // If we get here, validation passed. Remove the error message if it exists.
+                const existingErr = document.getElementById('form-error');
+                if (existingErr) {
+                    existingErr.remove();
+                }
+
+                /* Show loading */
+                const submitBtn = document.getElementById('submit-btn');
+                submitBtn.disabled = true;
+
+                document.getElementById('result-empty').classList.add('hidden');
+                document.getElementById('result-content').classList.add('hidden');
+                document.getElementById('result-loading').classList.remove('hidden');
+
+                try {
+                    const response = await fetch(`${window.location.origin}/predict`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'token': token,
+                            'api-key': 'demo_key'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    if (response.status === 401) {
+                        handleLogout();
+                        return;
+                    }
+
+                    const data = await response.json();
+                    if (data.detail) throw new Error(data.detail);
+
+                    /* Populate metadata */
+                    document.getElementById('res-brand').textContent = formData.company.toUpperCase();
+                    document.getElementById('res-year').textContent = formData.year;
+                    document.getElementById('res-km').textContent = formData.km_driven.toLocaleString('en-IN') + ' KM';
+
+                    /* Show result */
+                    document.getElementById('result-loading').classList.add('hidden');
+                    document.getElementById('result-content').classList.remove('hidden');
+                    document.getElementById('result-content').style.display = 'flex';
+
+                    /* Animate price counter */
+                    const priceText = data['Predicted Price'] || '0';
+                    const priceValue = parseFloat(priceText.replace(/[^0-9.-]+/g, ''));
+
+                    if (window.animateSlotMachine) {
+                        window.animateSlotMachine('price-value', priceValue);
+                    } else {
+                        document.getElementById('price-value').textContent = '₹' + priceValue.toLocaleString('en-IN');
+                    }
+
+                } catch (err) {
+                    document.getElementById('result-loading').classList.add('hidden');
+                    document.getElementById('result-empty').classList.remove('hidden');
+                    alert('SYSTEM ERROR: ' + err.message);
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
