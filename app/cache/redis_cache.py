@@ -19,7 +19,7 @@ def get_cached_prediction(key: str):
         return None
     try:
         value = redis_client.get(key)
-        return eval(value) if value else None
+        return float(value) if value else None
     except Exception:
         return None
 

@@ -33,7 +33,7 @@ This is not a toy project. It implements **JWT authentication**, **API key valid
 
 | Metric | Value |
 |:---|:---|
-| **Model Accuracy (R²)** | 94.2% on the held-out test set |
+| **Model Accuracy (R²)** | ~89% on the held-out test set |
 | **Features Analyzed** | 12 vehicle attributes per prediction |
 | **Brands Supported** | 31+ manufacturers indexed in training data |
 | **Inference Time** | Sub-10ms (pre-compiled `.joblib` model loaded at startup) |
