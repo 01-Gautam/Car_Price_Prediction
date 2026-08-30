@@ -294,28 +294,6 @@ Prometheus-compatible metrics endpoint, auto-instrumented by `prometheus-fastapi
 
 ---
 
-## 🎨 Frontend Design System
-
-The frontend is a zero-dependency vanilla HTML/CSS/JS application with a custom-built design system spanning **2100+ lines of CSS** organized into **36 named sections**:
-
-- **Design Tokens** — CSS custom properties for colors, spacing, typography, and easing curves
-- **Glassmorphism Auth Panel** — `backdrop-filter: blur()` with semi-transparent backgrounds
-- **WebGL Shader Backgrounds** — GLSL "Liquid Obsidian" (login) and "Deep Cosmic Dust" (dashboard)
-- **Micro-Animations** — Scroll-triggered reveals, magnetic buttons, shimmer effects, parallax cards
-- **Responsive Mobile Layout** — `@media (max-width: 768px)` breakpoint with full layout restructuring
-- **Page-Load Curtain** — Animated brand reveal on initial page load
-
----
-
-## 📊 Monitoring Stack
-
-When deployed via Docker Compose, the application includes a full observability pipeline:
-
-- **Prometheus** scrapes the `/metrics` endpoint every 10 seconds
-- **Grafana** connects to Prometheus as a data source for real-time dashboards
-- Tracked metrics include request count, latency histograms, and error rates (via `prometheus-fastapi-instrumentator`)
-
----
 
 ## 🔧 Environment Variables
 
